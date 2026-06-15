@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reserva de Campeones - Elige tu pelota</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="dropping">
+  <canvas id="sky"></canvas>
+
+  <div id="splash" aria-hidden="false">
+    <div id="splash-stars" aria-hidden="true"></div>
+    <div id="splash-content" role="dialog" aria-label="Pantalla de carga">
+      <img id="logo2" src="images/logo2.png" alt="logo2" />
+      <div id="loading-wrap" aria-hidden="true">
+        <div id="loading-label">Abriendo la reserva de campeones...</div>
+        <div id="loading-bar">
+          <div id="loading-progress" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header class="page-header" role="banner">
+    <h1>ELEGÍ LA PELOTA Y LLEVATE TU PREMIO</h1>
+  </header>
+
+  <main>
+    <div class="stars" role="list" aria-label="Elige una pelota">
+      <button class="star final-1" data-index="0" aria-label="Pelota izquierda" role="listitem">
+        <div class="star-inner">
+          <div class="white-halo"></div> 
+          <svg viewBox="0 0 120 120" class="star-svg football-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="ground-shadow"></div>
+        </div>
+      </button>
+
+      <button class="star final-2" data-index="1" aria-label="Pelota central" role="listitem">
+        <div class="star-inner">
+          <div class="white-halo"></div> 
+          <svg viewBox="0 0 120 120" class="star-svg football-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="ground-shadow"></div>
+        </div>
+      </button>
+
+      <button class="star final-3" data-index="2" aria-label="Pelota derecha" role="listitem">
+        <div class="star-inner">
+          <div class="white-halo"></div> 
+          <svg viewBox="0 0 120 120" class="star-svg football-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="ground-shadow"></div>
+        </div>
+      </button>
+    </div>
+
+    <div id="result" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-content">
+        <h2 id="modal-title">¡Ganaste!</h2>
+        <p id="prize-text"></p>
+        <p id="prize-date" class="prize-date" aria-hidden="true"></p>
+        <button id="close-btn" class="btn-primary">Cerrar</button>
+      </div>
+    </div>
+
+    <div id="confetti" aria-hidden="true"></div>
+  </main>
+
+  <audio id="claim-sound" preload="auto" aria-hidden="true">
+    <source src="sound/claim.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
