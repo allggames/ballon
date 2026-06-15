@@ -66,7 +66,6 @@
   const todayKey = () => new Date().toISOString().slice(0,10);
 
   function loadOrCreateAssignments() {
-    // Definimos posiciones fijas: Pelota izquierda es siempre Oro, Pelota derecha es siempre Celeste
     return [
       { label: '150% BONO DORADO 🏆✨', type: 'gold' },
       { label: '200% BONO DIAMANTE 💎✨', type: 'diamond' }
@@ -101,8 +100,9 @@
   function explodeConfetti() {
     const container = document.getElementById('confetti');
     if (!container) return;
-    const emojis = ["⚽", "✨", "🏆", "💎", "🟢"];
-    for (let i = 0; i < 30; i++) {
+    // Agregamos banderitas al confeti explosivo
+    const emojis = ["⚽", "✨", "🏆", "💎", "🇦🇷", "🇧🇷", "🇪🇸", "🇺🇾"];
+    for (let i = 0; i < 35; i++) {
       const el = document.createElement('div');
       el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
       el.style.position = 'fixed';
@@ -111,11 +111,11 @@
       el.style.fontSize = '24px';
       container.appendChild(el);
       const angle = Math.random() * Math.PI * 2;
-      const dist = 100 + Math.random() * 200;
+      const dist = 100 + Math.random() * 240;
       el.animate([
         { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
         { transform: `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px) scale(1.5)`, opacity: 0 }
-      ], { duration: 1000, easing: 'ease-out' }).onfinish = () => el.remove();
+      ], { duration: 1100, easing: 'ease-out' }).onfinish = () => el.remove();
     }
   }
 
@@ -198,7 +198,7 @@
     setTimeout(() => document.body.classList.remove('dropping'), 100);
   });
 
-  /* --- CANVAS FONDO (EFECTO CANCHA) --- */
+  /* --- CANVAS FONDO (CANCHA + BANDERITAS FLOTANTES) --- */
   const canvas = document.getElementById('sky');
   if (canvas) {
     const ctx = canvas.getContext('2d');
@@ -207,14 +207,29 @@
     window.addEventListener('resize', resize);
     resize();
     
+    // Lista de emojis de banderas que van a flotar en el fondo
+    const flagList = ["🇦🇷", "🇧🇷", "🇪🇸", "🇺🇾", "🇲🇽", "🇨🇱", "🇨🇴", "🇵🇹", "🇫🇷", "🇮🇹"];
+    
+    // Generamos un pool de 25 banderitas con posiciones y velocidades aleatorias
+    const backgroundFlags = Array.from({ length: 25 }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      text: flagList[Math.floor(Math.random() * flagList.length)],
+      size: 16 + Math.random() * 14,
+      speedY: 0.3 + Math.random() * 0.5, // Velocidad de subida
+      opacity: 0.15 + Math.random() * 0.2 // Muy sutiles para no tapar el juego
+    }));
+
     const draw = () => {
+      // Fondo verde césped
       let fieldGrad = ctx.createRadialGradient(w/2, h/2, 10, w/2, h/2, Math.max(w, h));
       fieldGrad.addColorStop(0, '#1b5e20'); 
       fieldGrad.addColorStop(1, '#0b3010'); 
       ctx.fillStyle = fieldGrad;
       ctx.fillRect(0,0,w,h);
       
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      // Líneas reglamentarias de fútbol
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
       ctx.lineWidth = 4;
       
       ctx.beginPath();
@@ -229,6 +244,24 @@
       ctx.beginPath();
       ctx.arc(w / 2, h / 2, 5, 0, Math.PI * 2);
       ctx.fill();
+
+      // Dibujar y animar las banderitas flotantes
+      backgroundFlags.forEach(f => {
+        ctx.save();
+        ctx.globalAlpha = f.opacity;
+        ctx.font = `${f.size}px Arial`;
+        ctx.fillText(f.text, f.x, f.y);
+        ctx.restore();
+
+        // Mover hacia arriba continuamente
+        f.y -= f.speedY;
+        
+        // Si sale por arriba, reaparece abajo con nueva posición X
+        if (f.y < -30) {
+          f.y = h + 30;
+          f.x = Math.random() * w;
+        }
+      });
 
       requestAnimationFrame(draw);
     };
