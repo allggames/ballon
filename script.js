@@ -60,26 +60,17 @@
     });
   })();
 
-  /* --- LÓGICA DE PREMIOS --- */
+  /* --- LÓGICA DE PREMIOS FIJOS --- */
   const ASSIGN_KEY = 'football.assignments';
   const SELECT_KEY = 'football.selection';
   const todayKey = () => new Date().toISOString().slice(0,10);
 
-  function loadOrCreateAssignments(count) {
-    const today = todayKey();
-    const raw = localStorage.getItem(ASSIGN_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed.date === today) return parsed.assignments;
-    }
-    // Solo dos opciones de premio asignadas aleatoriamente a las 2 pelotas
-    const prizes = [
+  function loadOrCreateAssignments() {
+    // Definimos posiciones fijas: Pelota izquierda es siempre Oro, Pelota derecha es siempre Celeste
+    return [
       { label: '150% BONO DORADO 🏆✨', type: 'gold' },
       { label: '200% BONO DIAMANTE 💎✨', type: 'diamond' }
     ];
-    const assigned = prizes.sort(() => Math.random() - 0.5);
-    localStorage.setItem(ASSIGN_KEY, JSON.stringify({ date: today, assignments: assigned }));
-    return assigned;
   }
 
   /* --- UI SETUP: DIBUJO DE LAS PELOTAS --- */
@@ -131,7 +122,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     setupFootballs(); 
     const buttons = document.querySelectorAll('.star');
-    const assignments = loadOrCreateAssignments(buttons.length);
+    const assignments = loadOrCreateAssignments();
     const selection = JSON.parse(localStorage.getItem(SELECT_KEY));
     let locked = selection && selection.date === todayKey();
 
