@@ -60,14 +60,15 @@
     });
   })();
 
-  /* --- LÓGICA DE PREMIOS FIJOS --- */
-  const SELECT_KEY = 'football.selection';
-
-  function loadOrCreateAssignments() {
-    return [
+  /* --- LÓGICA DE PREMIOS VARIABLES --- */
+  // Esta función ahora mezcla los premios al azar cada vez que se la llama
+  function generateRandomAssignments() {
+    const prizes = [
       { label: '150% BONO DORADO 🏆✨', type: 'gold' },
       { label: '200% BONO DIAMANTE 💎✨', type: 'diamond' }
     ];
+    // Se mezclan usando una función aleatoria matemática
+    return prizes.sort(() => Math.random() - 0.5);
   }
 
   /* --- UI SETUP: DIBUJO DE LAS PELOTAS --- */
@@ -151,9 +152,9 @@
     initFloatingFlags();
     
     const buttons = document.querySelectorAll('.star');
-    const assignments = loadOrCreateAssignments();
     
-    // Ya no bloqueamos al recargar la página, permitimos jugar libremente
+    // Generamos la primera mezcla aleatoria de premios al cargar la página
+    let currentAssignments = generateRandomAssignments();
     let locked = false;
 
     buttons.forEach((btn, idx) => {
@@ -161,7 +162,8 @@
         if (locked) return;
         locked = true;
         
-        const prize = assignments[idx];
+        // Toma el premio mezclado que le tocó a esta posición en esta partida
+        const prize = currentAssignments[idx];
         btn.classList.add('pop', 'flip', 'revealed-' + prize.type);
         
         const audio = document.getElementById('claim-sound');
@@ -189,7 +191,7 @@
       });
     });
 
-    // Configuración Botón Reclamar (Verde)
+    // Botón Reclamar (Verde)
     const closeBtn = document.getElementById('close-btn');
     if (closeBtn) {
       closeBtn.innerHTML = 'RECLAMAR PREMIO 📸<br><small style="font-size:0.7em;font-weight:normal;">Capturá y tocá acá</small>';
@@ -203,20 +205,21 @@
       });
     }
 
-    // Configuración Botón Volver a Jugar
+    // Botón Volver a Jugar
     const resetBtn = document.getElementById('reset-btn');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        // Escondemos el cartel modal
         document.getElementById('result').classList.remove('show');
         document.getElementById('result').classList.add('hidden');
         
-        // Reseteamos el estado visual de los dos balones
+        // Quitamos los colores revelados para que vuelvan a ser siluetas oscuras
         buttons.forEach(btn => {
           btn.className = btn.classList.contains('final-1') ? 'star final-1' : 'star final-2';
         });
         
-        // Destrabamos el juego para una nueva elección
+        // ¡NUEVO!: Volvemos a mezclar las posiciones de los premios para la siguiente ronda
+        currentAssignments = generateRandomAssignments();
+        
         locked = false;
       });
     }
