@@ -100,7 +100,6 @@
   function explodeConfetti() {
     const container = document.getElementById('confetti');
     if (!container) return;
-    // Agregamos banderitas al confeti explosivo
     const emojis = ["⚽", "✨", "🏆", "💎", "🇦🇷", "🇧🇷", "🇪🇸", "🇺🇾"];
     for (let i = 0; i < 35; i++) {
       const el = document.createElement('div');
@@ -119,8 +118,42 @@
     }
   }
 
+  // --- ANIMACIÓN DE BANDERAS FLOTANTES (DOM ELEMENT) ---
+  function initFloatingFlags() {
+    const fieldContainer = document.querySelector('.soccer-field-bg');
+    if (!fieldContainer) return;
+
+    const flagList = ["🇦🇷", "🇧🇷", "🇪🇸", "🇺🇾", "🇲🇽", "🇨🇱", "🇨🇴", "🇵🇹", "🇫🇷", "🇮🇹"];
+    const FLAG_COUNT = 20;
+
+    for (let i = 0; i < FLAG_COUNT; i++) {
+      const flag = document.createElement('div');
+      flag.className = 'bg-floating-flag';
+      flag.textContent = flagList[Math.floor(Math.random() * flagList.length)];
+      flag.style.left = Math.random() * 100 + '%';
+      flag.style.top = Math.random() * 100 + '%';
+      flag.style.fontSize = 16 + Math.random() * 12 + 'px';
+      flag.style.opacity = 0.15 + Math.random() * 0.15;
+      
+      // Animación suave de subida infinita
+      const duration = 15 + Math.random() * 15;
+      flag.animate([
+        { transform: 'translateY(110vh)' },
+        { transform: 'translateY(-10vh)' }
+      ], {
+        duration: duration * 1000,
+        iterations: Infinity,
+        delay: -Math.random() * duration * 1000
+      });
+
+      fieldContainer.appendChild(flag);
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     setupFootballs(); 
+    initFloatingFlags();
+    
     const buttons = document.querySelectorAll('.star');
     const assignments = loadOrCreateAssignments();
     const selection = JSON.parse(localStorage.getItem(SELECT_KEY));
@@ -197,74 +230,4 @@
 
     setTimeout(() => document.body.classList.remove('dropping'), 100);
   });
-
-  /* --- CANVAS FONDO (CANCHA + BANDERITAS FLOTANTES) --- */
-  const canvas = document.getElementById('sky');
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    let w, h;
-    const resize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
-    window.addEventListener('resize', resize);
-    resize();
-    
-    // Lista de emojis de banderas que van a flotar en el fondo
-    const flagList = ["🇦🇷", "🇧🇷", "🇪🇸", "🇺🇾", "🇲🇽", "🇨🇱", "🇨🇴", "🇵🇹", "🇫🇷", "🇮🇹"];
-    
-    // Generamos un pool de 25 banderitas con posiciones y velocidades aleatorias
-    const backgroundFlags = Array.from({ length: 25 }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      text: flagList[Math.floor(Math.random() * flagList.length)],
-      size: 16 + Math.random() * 14,
-      speedY: 0.3 + Math.random() * 0.5, // Velocidad de subida
-      opacity: 0.15 + Math.random() * 0.2 // Muy sutiles para no tapar el juego
-    }));
-
-    const draw = () => {
-      // Fondo verde césped
-      let fieldGrad = ctx.createRadialGradient(w/2, h/2, 10, w/2, h/2, Math.max(w, h));
-      fieldGrad.addColorStop(0, '#1b5e20'); 
-      fieldGrad.addColorStop(1, '#0b3010'); 
-      ctx.fillStyle = fieldGrad;
-      ctx.fillRect(0,0,w,h);
-      
-      // Líneas reglamentarias de fútbol
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-      ctx.lineWidth = 4;
-      
-      ctx.beginPath();
-      ctx.moveTo(0, h / 2);
-      ctx.lineTo(w, h / 2);
-      ctx.stroke();
-      
-      ctx.beginPath();
-      ctx.arc(w / 2, h / 2, Math.min(w, h) * 0.2, 0, Math.PI * 2);
-      ctx.stroke();
-      
-      ctx.beginPath();
-      ctx.arc(w / 2, h / 2, 5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Dibujar y animar las banderitas flotantes
-      backgroundFlags.forEach(f => {
-        ctx.save();
-        ctx.globalAlpha = f.opacity;
-        ctx.font = `${f.size}px Arial`;
-        ctx.fillText(f.text, f.x, f.y);
-        ctx.restore();
-
-        // Mover hacia arriba continuamente
-        f.y -= f.speedY;
-        
-        // Si sale por arriba, reaparece abajo con nueva posición X
-        if (f.y < -30) {
-          f.y = h + 30;
-          f.x = Math.random() * w;
-        }
-      });
-
-      requestAnimationFrame(draw);
-    };
-    draw();
-  }
 })();
