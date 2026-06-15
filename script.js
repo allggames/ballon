@@ -61,9 +61,7 @@
   })();
 
   /* --- LÓGICA DE PREMIOS FIJOS --- */
-  const ASSIGN_KEY = 'football.assignments';
   const SELECT_KEY = 'football.selection';
-  const todayKey = () => new Date().toISOString().slice(0,10);
 
   function loadOrCreateAssignments() {
     return [
@@ -118,7 +116,6 @@
     }
   }
 
-  // --- ANIMACIÓN DE BANDERAS FLOTANTES (DOM ELEMENT) ---
   function initFloatingFlags() {
     const fieldContainer = document.querySelector('.soccer-field-bg');
     if (!fieldContainer) return;
@@ -135,7 +132,6 @@
       flag.style.fontSize = 16 + Math.random() * 12 + 'px';
       flag.style.opacity = 0.15 + Math.random() * 0.15;
       
-      // Animación suave de subida infinita
       const duration = 15 + Math.random() * 15;
       flag.animate([
         { transform: 'translateY(110vh)' },
@@ -156,30 +152,9 @@
     
     const buttons = document.querySelectorAll('.star');
     const assignments = loadOrCreateAssignments();
-    const selection = JSON.parse(localStorage.getItem(SELECT_KEY));
-    let locked = selection && selection.date === todayKey();
-
-    if (locked) {
-      const prizeText = document.getElementById('prize-text');
-      if(prizeText) prizeText.textContent = selection.prize.label;
-      
-      const selectedBtn = buttons[selection.index];
-      if (selectedBtn) {
-        selectedBtn.classList.add('revealed-' + selection.prize.type);
-      }
-
-      const dateEl = document.getElementById('prize-date');
-      if(dateEl && selection.timeString) {
-          dateEl.textContent = `Reclamado el ${selection.timeString}`;
-          dateEl.removeAttribute('aria-hidden');
-          dateEl.style.display = 'block';
-          dateEl.style.marginBottom = '15px';
-          dateEl.style.fontSize = '14px';
-      }
-
-      document.getElementById('result').classList.remove('hidden');
-      document.getElementById('result').classList.add('show');
-    }
+    
+    // Ya no bloqueamos al recargar la página, permitimos jugar libremente
+    let locked = false;
 
     buttons.forEach((btn, idx) => {
       btn.addEventListener('click', () => {
@@ -196,7 +171,6 @@
           const now = new Date();
           const timeString = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} a las ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} hs`;
 
-          localStorage.setItem(SELECT_KEY, JSON.stringify({ date: todayKey(), prize, timeString, index: idx }));
           document.getElementById('prize-text').textContent = prize.label;
           
           const dateEl = document.getElementById('prize-date');
@@ -215,6 +189,7 @@
       });
     });
 
+    // Configuración Botón Reclamar (Verde)
     const closeBtn = document.getElementById('close-btn');
     if (closeBtn) {
       closeBtn.innerHTML = 'RECLAMAR PREMIO 📸<br><small style="font-size:0.7em;font-weight:normal;">Capturá y tocá acá</small>';
@@ -225,6 +200,24 @@
       
       closeBtn.addEventListener('click', () => {
         window.location.href = "https://www.casinoatenea.com/?open=true";
+      });
+    }
+
+    // Configuración Botón Volver a Jugar
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        // Escondemos el cartel modal
+        document.getElementById('result').classList.remove('show');
+        document.getElementById('result').classList.add('hidden');
+        
+        // Reseteamos el estado visual de los dos balones
+        buttons.forEach(btn => {
+          btn.className = btn.classList.contains('final-1') ? 'star final-1' : 'star final-2';
+        });
+        
+        // Destrabamos el juego para una nueva elección
+        locked = false;
       });
     }
 
