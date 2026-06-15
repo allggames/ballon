@@ -13,7 +13,7 @@
       for (let i = 0; i < STAR_COUNT; i++) {
         const s = document.createElement('div');
         s.className = 'splash-star';
-        s.textContent = '⚽'; // Ahora caen pelotas de fútbol en el cargador
+        s.textContent = '⚽'; 
         
         const randomX = Math.floor(Math.random() * 100);
         const randomY = Math.floor(Math.random() * 100);
@@ -72,34 +72,29 @@
       const parsed = JSON.parse(raw);
       if (parsed.date === today) return parsed.assignments;
     }
-    // Premios adaptados a la temática Dorada y Diamante
+    // Solo dos opciones de premio asignadas aleatoriamente a las 2 pelotas
     const prizes = [
-      { label: '100% BONO DORADO 🏆✨', type: 'gold' },
-      { label: '150% BONO DIAMANTE 💎✨', type: 'diamond' },
-      { label: '200% BONO LEYENDA 👑✨', type: 'gold' }
+      { label: '150% BONO DORADO 🏆✨', type: 'gold' },
+      { label: '200% BONO DIAMANTE 💎✨', type: 'diamond' }
     ];
     const assigned = prizes.sort(() => Math.random() - 0.5);
     localStorage.setItem(ASSIGN_KEY, JSON.stringify({ date: today, assignments: assigned }));
     return assigned;
   }
 
-  /* --- UI SETUP: DIBUJO DE LAS 3 PELOTAS (SILUETAS) --- */
+  /* --- UI SETUP: DIBUJO DE LAS PELOTAS --- */
   function setupFootballs() {
     const svgs = document.querySelectorAll('.football-svg');
     
-    // SVG geométrico detallado de una pelota de fútbol con sus parches (gajos)
     const footballHTML = `
       <g transform="translate(0, 0)">
         <circle class="fb-outline" cx="60" cy="60" r="50" />
-        
         <polygon class="fb-patch" points="60,45 73,54 68,70 52,70 47,54" />
         <line class="fb-line" x1="60" y1="45" x2="60" y2="10" />
         <line class="fb-line" x1="73" y1="54" x2="101" y2="42" />
         <line class="fb-line" x1="68" y1="70" x2="86" y2="95" />
         <line class="fb-line" x1="52" y1="70" x2="34" y2="95" />
         <line class="fb-line" x1="47" y1="54" x2="19" y2="42" />
-        
-        <polygon class="fb-patch" points="60,10 42,22 47,42 60,45" style="display:none;"/>
         <path class="fb-edge-patch" d="M 38,19 L 60,10 L 82,19 L 73,34 L 47,34 Z" />
         <path class="fb-edge-patch" d="M 101,42 L 108,65 L 88,80 L 73,54 Z" />
         <path class="fb-edge-patch" d="M 19,42 L 12,65 L 32,80 L 47,54 Z" />
@@ -144,7 +139,6 @@
       const prizeText = document.getElementById('prize-text');
       if(prizeText) prizeText.textContent = selection.prize.label;
       
-      // Aplicar color guardado a la pelota seleccionada si ya jugó
       const selectedBtn = buttons[selection.index];
       if (selectedBtn) {
         selectedBtn.classList.add('revealed-' + selection.prize.type);
@@ -169,8 +163,6 @@
         locked = true;
         
         const prize = assignments[idx];
-        
-        // Revela de qué tipo es la pelota agregando la clase CSS de color
         btn.classList.add('pop', 'flip', 'revealed-' + prize.type);
         
         const audio = document.getElementById('claim-sound');
@@ -215,7 +207,7 @@
     setTimeout(() => document.body.classList.remove('dropping'), 100);
   });
 
-  /* --- CANVAS FONDO (EFECTO CANCHA / LÍNEAS DE JUEGO) --- */
+  /* --- CANVAS FONDO (EFECTO CANCHA) --- */
   const canvas = document.getElementById('sky');
   if (canvas) {
     const ctx = canvas.getContext('2d');
@@ -225,30 +217,24 @@
     resize();
     
     const draw = () => {
-      // Fondo verde césped (gradiente de estadio)
       let fieldGrad = ctx.createRadialGradient(w/2, h/2, 10, w/2, h/2, Math.max(w, h));
-      fieldGrad.addColorStop(0, '#1b5e20'); // Verde brillante central
-      fieldGrad.addColorStop(1, '#0b3010'); // Verde oscuro en las esquinas
+      fieldGrad.addColorStop(0, '#1b5e20'); 
+      fieldGrad.addColorStop(1, '#0b3010'); 
       ctx.fillStyle = fieldGrad;
       ctx.fillRect(0,0,w,h);
       
-      // Dibujamos líneas blancas tenues de la cancha de fútbol
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
       ctx.lineWidth = 4;
       
-      // Línea de medio campo
       ctx.beginPath();
       ctx.moveTo(0, h / 2);
       ctx.lineTo(w, h / 2);
       ctx.stroke();
       
-      // Círculo central
       ctx.beginPath();
       ctx.arc(w / 2, h / 2, Math.min(w, h) * 0.2, 0, Math.PI * 2);
       ctx.stroke();
       
-      // Punto central
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.beginPath();
       ctx.arc(w / 2, h / 2, 5, 0, Math.PI * 2);
       ctx.fill();
